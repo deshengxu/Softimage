@@ -12,6 +12,7 @@
 		93294A551DAC9269001C8923 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93294A541DAC9269001C8923 /* Assets.xcassets */; };
 		93294A581DAC9269001C8923 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93294A561DAC9269001C8923 /* Main.storyboard */; };
 		93294A631DAC9269001C8923 /* SoftimageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294A621DAC9269001C8923 /* SoftimageTests.swift */; };
+		93294A701DAD48F7001C8923 /* OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93294A6F1DAD48F7001C8923 /* OpenCV.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,9 @@
 		93294A5E1DAC9269001C8923 /* SoftimageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SoftimageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		93294A621DAC9269001C8923 /* SoftimageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftimageTests.swift; sourceTree = "<group>"; };
 		93294A641DAC9269001C8923 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93294A6D1DAD48F6001C8923 /* Softimage-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Softimage-Bridging-Header.h"; sourceTree = "<group>"; };
+		93294A6E1DAD48F7001C8923 /* OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCV.h; sourceTree = "<group>"; };
+		93294A6F1DAD48F7001C8923 /* OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCV.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,11 +79,14 @@
 		93294A4F1DAC9269001C8923 /* Softimage */ = {
 			isa = PBXGroup;
 			children = (
+				93294A6E1DAD48F7001C8923 /* OpenCV.h */,
+				93294A6F1DAD48F7001C8923 /* OpenCV.mm */,
 				93294A501DAC9269001C8923 /* AppDelegate.swift */,
 				93294A521DAC9269001C8923 /* ViewController.swift */,
 				93294A541DAC9269001C8923 /* Assets.xcassets */,
 				93294A561DAC9269001C8923 /* Main.storyboard */,
 				93294A591DAC9269001C8923 /* Info.plist */,
+				93294A6D1DAD48F6001C8923 /* Softimage-Bridging-Header.h */,
 			);
 			path = Softimage;
 			sourceTree = "<group>";
@@ -143,6 +150,7 @@
 				TargetAttributes = {
 					93294A4C1DAC9269001C8923 = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 					93294A5D1DAC9269001C8923 = {
@@ -197,6 +205,7 @@
 			files = (
 				93294A531DAC9269001C8923 /* ViewController.swift in Sources */,
 				93294A511DAC9269001C8923 /* AppDelegate.swift in Sources */,
+				93294A701DAD48F7001C8923 /* OpenCV.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,9 +279,32 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lopencv_calib3d",
+					"-lopencv_contrib",
+					"-lopencv_core",
+					"-lopencv_features2d",
+					"-lopencv_flann",
+					"-lopencv_gpu",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+					"-lopencv_legacy",
+					"-lopencv_ml",
+					"-lopencv_nonfree",
+					"-lopencv_objdetect",
+					"-lopencv_ocl",
+					"-lopencv_photo",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_ts",
+					"-lopencv_video",
+					"-lopencv_videostab",
+				);
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -313,8 +345,31 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lopencv_calib3d",
+					"-lopencv_contrib",
+					"-lopencv_core",
+					"-lopencv_features2d",
+					"-lopencv_flann",
+					"-lopencv_gpu",
+					"-lopencv_highgui",
+					"-lopencv_imgproc",
+					"-lopencv_legacy",
+					"-lopencv_ml",
+					"-lopencv_nonfree",
+					"-lopencv_objdetect",
+					"-lopencv_ocl",
+					"-lopencv_photo",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_ts",
+					"-lopencv_video",
+					"-lopencv_videostab",
+				);
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
@@ -324,11 +379,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Softimage/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xudesheng.Softimage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Softimage/Softimage-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -337,11 +395,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Softimage/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.xudesheng.Softimage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Softimage/Softimage-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
