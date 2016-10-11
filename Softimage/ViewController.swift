@@ -10,7 +10,13 @@ import Cocoa
 
 
 class ViewController: NSViewController {
-
+    @IBOutlet weak var totalFiles: NSTextField! //total pictures in selection
+    @IBOutlet weak var lastUsedTime: NSTextField!   //used time in last picture processing
+    @IBOutlet weak var totalUsedTime: NSTextField!  //total used time in processing
+    @IBOutlet weak var logField: NSTextField!   //processing log
+    @IBOutlet weak var originalImageView: NSImageView!
+    @IBOutlet weak var destinationImageView: NSImageView!
+    
     @IBOutlet weak var source: NSTextField! // it can be a folder or an image
     
     @IBOutlet weak var target: NSTextField! // it must be a folder
@@ -39,6 +45,11 @@ class ViewController: NSViewController {
             }
         }
 
+    }
+    @IBAction func startProcessing(_ sender: NSButton) {
+        startButton.isEnabled=false
+        exitButton.isEnabled=true
+        
     }
     @IBAction func selectSource(_ sender: NSButton) {
         let myFileDialog: NSOpenPanel = NSOpenPanel()
@@ -73,10 +84,14 @@ class ViewController: NSViewController {
                     if isPictureSafe(path!){
                         startButton.isEnabled=true
                         exitButton.isEnabled=false
+                        if let image=loadImageFromLocalFile(path!){
+                            originalImageView.image=image
+                        }
+
                     }else{
                         startButton.isEnabled=false
                         exitButton.isEnabled=false
-                    }
+                                            }
                 }
             }else{
                 startButton.isEnabled=false
@@ -87,7 +102,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var startButton: NSButton!
     
     @IBOutlet weak var exitButton: NSButton!
-    
+     
     override func viewDidLoad() {
         super.viewDidLoad()
         startButton.isEnabled=false
@@ -154,5 +169,11 @@ class ViewController: NSViewController {
         return false
     }
 
+    func loadImageFromLocalFile(_ atPath:String)->NSImage?{
+        NSLog("Loading \(atPath)")
+        
+        return NSImage(contentsOfFile: atPath)
+        
+    }
 }
 
