@@ -50,7 +50,50 @@ class ViewController: NSViewController {
         startButton.isEnabled=false
         exitButton.isEnabled=true
         
+        let sourceText = source.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let imageList:[NSURL] = collectImagesFromFolder(sourceText)
+        
+        if imageList.count == 0 {
+            let myPopup: NSAlert = NSAlert()
+            myPopup.messageText = "Notice"
+            myPopup.informativeText = "Nothing to process!"
+            myPopup.alertStyle = NSAlertStyle.informational
+            myPopup.addButton(withTitle: "OK")
+            myPopup.runModal()
+            return
+        }
+        NSLog("\(imageList)")
+        totalFiles.stringValue = "\(imageList.count)"
+        
+        //a new thread or process should be started here to handle all pictures processing
+        processingAllImages(imageList)
     }
+    
+    //need to add more control in different thread or process here.
+    func processingAllImages(_ imageList:[NSURL]){
+        //let queue = DispatchQueue(label: "ImageBlur")
+        //queue.async {
+            for imageFile in imageList{
+                self.logField.stringValue += "Processing file:\(imageFile)"
+                
+                if let sourceImage = ImageSofter.loadImageFromLocalFile(imageFile) {
+                    NSLog("Loaded from file:\(imageFile)")
+                    
+                    self.originalImageView.image=sourceImage
+                    
+                    if let outImage = ImageSofter.blurOnePicture(sourceImage){
+                        self.destinationImageView.image=outImage
+                    }
+                }else{
+                    NSLog("failed to load image from:\(imageFile)")
+                }
+            }
+
+        //}
+        
+}
+    
     @IBAction func selectSource(_ sender: NSButton) {
         let myFileDialog: NSOpenPanel = NSOpenPanel()
         myFileDialog.allowsMultipleSelection=false
@@ -68,9 +111,9 @@ class ViewController: NSViewController {
             var isDir : ObjCBool = false
             if fileManager.fileExists(atPath: path!, isDirectory:&isDir) {
                 if isDir.boolValue {
-                    NSLog("it's a folder!\(path)")
+                    //NSLog("it's a folder!\(path)")
                     source.stringValue="\(path!)"
-                    if isFolderWithPictureSafe(path!){
+                    if ImageSofter.isFolderWithPictureSafe(path!){
                         startButton.isEnabled=true
                         exitButton.isEnabled=false
                     }else{
@@ -79,13 +122,16 @@ class ViewController: NSViewController {
                     }
                     
                 } else {
-                    NSLog("It's a file:\(path)")
+                    //NSLog("It's a file:\(path)")
                     source.stringValue="\(path!)"
-                    if isPictureSafe(path!){
+                    if ImageSofter.isPictureSafe(path!){
                         startButton.isEnabled=true
                         exitButton.isEnabled=false
-                        if let image=loadImageFromLocalFile(path!){
+                        if let image=ImageSofter.loadImageFromLocalFile(path!){
                             originalImageView.image=image
+                            //if let outImage = ImageSofter.blurOnePicture(image){
+                            //    destinationImageView.image=outImage
+                            //}
                         }
 
                     }else{
@@ -116,64 +162,42 @@ class ViewController: NSViewController {
         }
     }
     
-    func isFolderWithPictureUnsafe(_ atPath:String)->Bool{
-        //atPath may not exist or may be a file
-        //so, it needs a safe check
-        let fileManager = FileManager.default
-            var isDir:ObjCBool = false
-            if fileManager.fileExists(atPath: atPath, isDirectory: &isDir){
-                if isDir.boolValue{
-                    return isFolderWithPictureSafe(atPath)
-            }
-        }
-        return false
-    }
-
-    func isFolderWithPictureSafe(_ atPath:String)->Bool{
-        //assume path exist and is a folder
-        //doesn't need to check again.
-        let fileManager=FileManager.default
+    
+    
+    func collectImagesFromFolder(_ atPath:String)->[NSURL]{
+        var imageList = [NSURL]()
         
-        do{
-            let filelist = try fileManager.contentsOfDirectory(atPath: atPath)
-            for filename in filelist{
-                if isPictureSafe(filename){
-                    return true
-                }
-            }
-        }catch{return false}
-        return false
-    }
-    
-    func isPictureSafe(_ atPath:String)->Bool{
-        //atPath has been confirmed is a file.
-        //so, it doesn't need to check exists or not again.
-        if atPath.hasSuffix("jpg") || atPath.hasSuffix("JPG") || atPath.hasSuffix("JPEG")||atPath.hasSuffix("jpeg"){
-            return true
-        }
-        return false
-    }
-    
-    func isPictureUnsafe(_ atPath:String)->Bool{
-        //atPath may be an unchecked path or file name. 
-        //so, it needs a recheck
         let fileManager = FileManager.default
         var isDir:ObjCBool = false
         if fileManager.fileExists(atPath: atPath, isDirectory: &isDir){
             if isDir.boolValue{
-                return false
-            }else{
-                return isPictureSafe(atPath)
-            }
-        }
-        return false
-    }
+                do{
+                    NSLog("Processing folder:\(atPath)")
+                    let filelist = try fileManager.contentsOfDirectory(atPath: atPath)
+                    let documentsURL = NSURL(fileURLWithPath: atPath, isDirectory: true)
+                    
+                    for filename in filelist{
+                        if ImageSofter.isPictureSafe(filename){
+                            let fileURL = NSURL(fileURLWithPath: filename, relativeTo: documentsURL as URL)
+                            //imageList += [fileURL.absoluteString!]
+                            imageList += [fileURL]
+                        }
+                    }
+                    return imageList    // return all images in a folder
+                }catch{return imageList}
 
-    func loadImageFromLocalFile(_ atPath:String)->NSImage?{
-        NSLog("Loading \(atPath)")
-        
-        return NSImage(contentsOfFile: atPath)
-        
+            }else{
+                if ImageSofter.isPictureSafe(atPath) {
+                    let fileURL = NSURL(fileURLWithPath: atPath, isDirectory: false)
+                    //imageList += [fileURL.absoluteString!]
+                    imageList += [fileURL]
+                    return imageList    //return image list with current image only
+                }
+            }
+        }else{
+            return imageList    //return an empty image list
+        }
+        return imageList    //return an empty image list
     }
 }
 

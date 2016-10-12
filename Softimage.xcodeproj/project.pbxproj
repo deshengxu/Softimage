@@ -13,6 +13,7 @@
 		93294A581DAC9269001C8923 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93294A561DAC9269001C8923 /* Main.storyboard */; };
 		93294A631DAC9269001C8923 /* SoftimageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294A621DAC9269001C8923 /* SoftimageTests.swift */; };
 		93294A701DAD48F7001C8923 /* OpenCV.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93294A6F1DAD48F7001C8923 /* OpenCV.mm */; };
+		93294A721DADE91C001C8923 /* ImageSofter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93294A711DADE91C001C8923 /* ImageSofter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		93294A6D1DAD48F6001C8923 /* Softimage-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Softimage-Bridging-Header.h"; sourceTree = "<group>"; };
 		93294A6E1DAD48F7001C8923 /* OpenCV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCV.h; sourceTree = "<group>"; };
 		93294A6F1DAD48F7001C8923 /* OpenCV.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCV.mm; sourceTree = "<group>"; };
+		93294A711DADE91C001C8923 /* ImageSofter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSofter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 				93294A561DAC9269001C8923 /* Main.storyboard */,
 				93294A591DAC9269001C8923 /* Info.plist */,
 				93294A6D1DAD48F6001C8923 /* Softimage-Bridging-Header.h */,
+				93294A711DADE91C001C8923 /* ImageSofter.swift */,
 			);
 			path = Softimage;
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 			files = (
 				93294A531DAC9269001C8923 /* ViewController.swift in Sources */,
 				93294A511DAC9269001C8923 /* AppDelegate.swift in Sources */,
+				93294A721DADE91C001C8923 /* ImageSofter.swift in Sources */,
 				93294A701DAD48F7001C8923 /* OpenCV.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
