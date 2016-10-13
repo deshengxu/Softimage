@@ -8,8 +8,19 @@
 
 import Cocoa
 
+extension NSImage {
+    var imageJPGRepresentation: NSData {
+        return NSBitmapImageRep(data: tiffRepresentation!)!.representation(using: NSBitmapImageFileType.JPEG, properties: [:])! as NSData
+    }
+    func saveJPG(path:String) -> Bool {
+        return imageJPGRepresentation.write(toFile: path, atomically: true)
+    }
+}
 
-class ViewController: NSViewController {
+
+class ViewController: NSViewController, NSTextFieldDelegate {
+    var destinationFolder:NSURL? = nil
+    
     @IBOutlet weak var totalFiles: NSTextField! //total pictures in selection
     @IBOutlet weak var lastUsedTime: NSTextField!   //used time in last picture processing
     @IBOutlet weak var totalUsedTime: NSTextField!  //total used time in processing
@@ -46,7 +57,52 @@ class ViewController: NSViewController {
         }
 
     }
+    
+    func verifyDestinationFolder(){
+        destinationFolder = nil
+        let dstFolderText = target.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        if dstFolderText == ""{
+            let myPopup: NSAlert = NSAlert()
+            myPopup.messageText = "Target Folder"
+            myPopup.informativeText = "target folder can't be empty!"
+            myPopup.alertStyle = NSAlertStyle.warning
+            myPopup.addButton(withTitle: "OK")
+            myPopup.runModal()
+            return
+        }
+        
+        let fileManager = FileManager.default
+        var isDir : ObjCBool = false
+        
+        if fileManager.fileExists(atPath: dstFolderText, isDirectory:&isDir) {
+            if isDir.boolValue {
+                destinationFolder = NSURL(fileURLWithPath: dstFolderText, isDirectory: true)
+            }
+        }else{
+            do{
+                try fileManager.createDirectory(atPath: dstFolderText, withIntermediateDirectories: true, attributes: nil)
+                destinationFolder = NSURL(fileURLWithPath: dstFolderText, isDirectory: true)
+            }catch let error as NSError {
+                NSLog("Unable to create directory \(error.debugDescription)")
+                destinationFolder = nil
+            }
+        }
+        
+        if destinationFolder == nil{
+            let myPopup: NSAlert = NSAlert()
+            myPopup.messageText = "Target Folder"
+            myPopup.informativeText = "Target folder can't be found or created!"
+            myPopup.alertStyle = NSAlertStyle.warning
+            myPopup.addButton(withTitle: "OK")
+            myPopup.runModal()
+        }
+    }
+    
     @IBAction func startProcessing(_ sender: NSButton) {
+        verifyDestinationFolder()
+        if destinationFolder==nil{
+            return
+        }
         startButton.isEnabled=false
         exitButton.isEnabled=true
         
@@ -70,29 +126,84 @@ class ViewController: NSViewController {
         processingAllImages(imageList)
     }
     
-    //need to add more control in different thread or process here.
-    func processingAllImages(_ imageList:[NSURL]){
-        //let queue = DispatchQueue(label: "ImageBlur")
-        //queue.async {
-            for imageFile in imageList{
-                self.logField.stringValue += "Processing file:\(imageFile)"
-                
-                if let sourceImage = ImageSofter.loadImageFromLocalFile(imageFile) {
-                    NSLog("Loaded from file:\(imageFile)")
-                    
-                    self.originalImageView.image=sourceImage
-                    
-                    if let outImage = ImageSofter.blurOnePicture(sourceImage){
-                        self.destinationImageView.image=outImage
-                    }
-                }else{
-                    NSLog("failed to load image from:\(imageFile)")
-                }
-            }
-
-        //}
+    @IBAction func exitProcessing(_ sender: NSButton) {
+        ImageSofter.stopProcessing=true
+        NSLog("Stop sign has been sent out")
+        self.exitButton.isEnabled=false
         
-}
+    }
+    
+    //process all images from folder or the single file selected
+    func processingAllImages(_ imageList:[NSURL]){
+        
+        ImageSofter.stopProcessing = false
+        
+        var total_timeinterval: TimeInterval = 0
+        
+        for imageFile in imageList{
+            if ImageSofter.stopProcessing {
+                break;
+            }
+            self.logField.stringValue += "Processing file:\(imageFile)"
+            
+            DispatchQueue.global(qos: .background).async {
+                NSLog("This is run on the background queue")
+                let sourceImage = ImageSofter.loadImageFromLocalFile(imageFile)
+                    
+                if sourceImage != nil {
+                    let blur_starttime = NSDate()
+                    DispatchQueue.main.sync {
+                        self.originalImageView.image=sourceImage
+                    }
+                    //this is the key step to process a file.
+                    let outImage = ImageSofter.blurOnePicture(sourceImage!)
+                    
+                    if let fileName = imageFile.lastPathComponent {
+                        if let targetFileName = self.destinationFolder?.appendingPathComponent(fileName, isDirectory: false) {
+                            NSLog("file name: \(targetFileName)")
+                            if outImage != nil{
+                                if !outImage!.saveJPG(path: targetFileName.path){
+                                    self.logField.stringValue += "save failed:\(targetFileName)"
+                                }
+                            }
+                        }
+                        
+                    }
+
+                    
+                    let blur_endtime = NSDate()
+                    let time_spent = blur_endtime.timeIntervalSince(blur_starttime as Date)
+                    total_timeinterval += time_spent
+                    
+                    DispatchQueue.main.sync{
+                        NSLog("This is run on the main queue, after the previous code in outer block")
+                        self.lastUsedTime.stringValue = "\(time_spent)"
+                        self.totalUsedTime.stringValue = "\(total_timeinterval)"
+                        self.originalImageView.image=sourceImage
+                        
+                        if outImage != nil{
+                            self.destinationImageView.image = outImage
+                        }
+                    }
+                        
+                }
+                    
+            }
+        }
+        
+        //notice process finish
+        //below notice window will pop up earlier than all queue finishes.
+        //therefore, it has misleading effect here.
+        
+        //let myPopup: NSAlert = NSAlert()
+        //myPopup.messageText = "Notice"
+        //myPopup.informativeText = "Process finished!"
+        //myPopup.alertStyle = NSAlertStyle.informational
+        //myPopup.addButton(withTitle: "OK")
+        //myPopup.runModal()
+        //return
+        
+    }
     
     @IBAction func selectSource(_ sender: NSButton) {
         let myFileDialog: NSOpenPanel = NSOpenPanel()
@@ -151,6 +262,8 @@ class ViewController: NSViewController {
      
     override func viewDidLoad() {
         super.viewDidLoad()
+        source.delegate = self
+        
         startButton.isEnabled=false
         exitButton.isEnabled=false
         // Do any additional setup after loading the view.
@@ -162,7 +275,55 @@ class ViewController: NSViewController {
         }
     }
     
+    override func controlTextDidChange(_ obj: Notification) {
+        let changedSource = obj.object as! NSTextField
+        // we don't need to identify which text field changed in this demo.
+        // we only need to verify source field anyway.
+        NSLog("\(changedSource.tag) \(changedSource.stringValue)")
+        verifySource()
+    }
     
+    //dynamically verify source folder or file when user is typing
+    //control enable status of start and exit button.
+    func verifySource(){
+        let atPath = source.stringValue
+        
+        let fileManager = FileManager.default
+        var isDir:ObjCBool = false
+        if fileManager.fileExists(atPath: atPath, isDirectory: &isDir){
+            if isDir.boolValue{
+                do{
+                    let filelist = try fileManager.contentsOfDirectory(atPath: atPath)
+                    for filename in filelist{
+                        if ImageSofter.isPictureSafe(filename){
+                            startButton.isEnabled = true
+                            exitButton.isEnabled = false
+                            if let image=ImageSofter.loadImageFromLocalFile(atPath){
+                                originalImageView.image=image
+                            }
+                        }
+                    }
+                    
+                }catch{
+                    startButton.isEnabled = false
+                    exitButton.isEnabled = false
+                }
+                
+            }else{
+                //NSLog("Detected it is a file again!\(atPath)")
+                if ImageSofter.isPictureSafe(atPath) {
+                    NSLog("Then enable it!")
+                    startButton.isEnabled = true
+                    exitButton.isEnabled = false
+                }
+            }
+        }else{
+            startButton.isEnabled = false
+            exitButton.isEnabled = false
+        }
+        startButton.isEnabled = false
+        exitButton.isEnabled = false
+    }
     
     func collectImagesFromFolder(_ atPath:String)->[NSURL]{
         var imageList = [NSURL]()

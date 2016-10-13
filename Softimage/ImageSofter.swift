@@ -8,7 +8,11 @@
 
 import Foundation
 
+
+
 class ImageSofter{
+    static var stopProcessing : Bool = false
+    
     class func blurOnePicture(_ sourceImg:NSImage)->NSImage?{
         let outImage = OpenCV.cvtColorBGR2GRAY(sourceImg)
         

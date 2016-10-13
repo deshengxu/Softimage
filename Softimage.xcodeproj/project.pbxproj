@@ -353,6 +353,7 @@
 				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				"OTHER_LDFLAGS[arch=*]" = (
 					"-lopencv_calib3d",
 					"-lopencv_contrib",
@@ -459,6 +460,7 @@
 				93294A691DAC9269001C8923 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		93294A6A1DAC9269001C8923 /* Build configuration list for PBXNativeTarget "SoftimageTests" */ = {
 			isa = XCConfigurationList;
@@ -467,6 +469,7 @@
 				93294A6C1DAC9269001C8923 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
