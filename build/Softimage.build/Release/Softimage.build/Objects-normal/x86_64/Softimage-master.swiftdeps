@@ -1,0 +1,7 @@
+version: "Apple Swift version 3.0 (swiftlang-800.0.46.2 clang-800.0.38)"
+options: "a6f246f50dc396351d9e0e3924b2f31b"
+build_time: [530511540, 557010000]
+inputs:
+  "/Users/desheng/builds/Softimage/Softimage/ViewController.swift": [9223372036854775807, 0]
+  "/Users/desheng/builds/Softimage/Softimage/AppDelegate.swift": [9223372036854775807, 0]
+  "/Users/desheng/builds/Softimage/Softimage/ImageSofter.swift": [9223372036854775807, 0]
